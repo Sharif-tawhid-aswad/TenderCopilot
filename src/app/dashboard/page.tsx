@@ -16,14 +16,19 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { mockStats, mockTenders } from "@/lib/mock-data";
+import { createClient } from "@/utils/supabase/server";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const fullName = user?.user_metadata?.full_name || "there";
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back. Here is what is happening with your tenders.
+          Welcome back, {fullName}. Here is what is happening with your tenders.
         </p>
       </div>
 

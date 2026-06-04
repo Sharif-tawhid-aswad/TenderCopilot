@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import * as React from "react";
 import {
@@ -11,6 +11,7 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   Sidebar,
@@ -31,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { logout } from "@/app/auth/actions";
 
 const items = [
   {
@@ -60,7 +62,20 @@ const items = [
   },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  user?: {
+    email?: string;
+    user_metadata?: {
+      full_name?: string;
+    };
+  };
+}
+
+export function AppSidebar({ user }: AppSidebarProps) {
+  const pathname = usePathname();
+  const fullName = user?.user_metadata?.full_name || "User";
+  const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex items-center justify-between p-4">
@@ -76,7 +91,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton tooltip={item.title} render={<Link href={item.url} />}>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={pathname === item.url}
+                    render={<Link href={item.url} />}
+                  >
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                   </SidebarMenuButton>
@@ -94,11 +113,11 @@ export function AppSidebar() {
                 <SidebarMenuButton className="w-full justify-start gap-2">
                   <Avatar className="h-6 w-6">
                     <AvatarImage src="" />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden overflow-hidden text-left">
-                    <span className="text-sm font-medium truncate w-full">John Doe</span>
-                    <span className="text-xs text-muted-foreground truncate w-full">john@example.com</span>
+                    <span className="text-sm font-medium truncate w-full">{fullName}</span>
+                    <span className="text-xs text-muted-foreground truncate w-full">{user?.email}</span>
                   </div>
                 </SidebarMenuButton>
               } />
@@ -111,10 +130,14 @@ export function AppSidebar() {
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem variant="destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
+                <form action={logout}>
+                  <DropdownMenuItem variant="destructive">
+                    <button type="submit" className="flex items-center w-full">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </button>
+                  </DropdownMenuItem>
+                </form>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
