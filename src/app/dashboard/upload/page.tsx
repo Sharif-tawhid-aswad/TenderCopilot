@@ -1,5 +1,14 @@
-import PlaceholderPage from "@/components/placeholder-page";
+import { createClient } from "@/utils/supabase/server";
+import UploadTenderContent from "./content";
+import { redirect } from "next/navigation";
 
-export default function UploadPage() {
-  return <PlaceholderPage title="Upload Tender" />;
+export default async function UploadPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  return <UploadTenderContent userId={user.id} />;
 }
