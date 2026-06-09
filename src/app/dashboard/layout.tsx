@@ -2,14 +2,20 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/server";
+import { isSupabaseConfigured } from "@/lib/env";
+import { SupabaseConfigWarning } from "@/components/supabase-config-warning";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  if (!isSupabaseConfigured()) {
+    return <SupabaseConfigWarning />;
+  }
+
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
 
   return (
     <SidebarProvider>

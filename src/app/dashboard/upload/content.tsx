@@ -15,7 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { uploadTender } from "@/lib/tenders";
+import { uploadTender } from "@/lib/tenders/client";
 import { useRouter } from "next/navigation";
 
 interface UploadTenderPageProps {

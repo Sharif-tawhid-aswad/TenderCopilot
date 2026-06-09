@@ -1,7 +1,8 @@
-import { createClient } from "@/utils/supabase/client";
+import { createClient as createBrowserClient } from "@/utils/supabase/client";
 
 export async function uploadTender(file: File, userId: string, title: string) {
-  const supabase = createClient();
+  const supabase = createBrowserClient();
+  if (!supabase) throw new Error("Supabase is not configured");
 
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -25,13 +26,12 @@ export async function uploadTender(file: File, userId: string, title: string) {
       file_name: file.name,
       storage_path: filePath,
       status: 'draft',
-      organization: 'Not Specified' // Default for now
+      organization: 'Not Specified'
     })
     .select()
     .single();
 
   if (dbError) {
-    // Cleanup storage if DB fails
     await supabase.storage.from('tenders').remove([filePath]);
     throw dbError;
   }
@@ -39,25 +39,5 @@ export async function uploadTender(file: File, userId: string, title: string) {
   return tender;
 }
 
-export async function getTenders() {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('tenders')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-}
-
-export async function getTenderById(id: string) {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('tenders')
-    .select('*, analyses(*)')
-    .eq('id', id)
-    .single();
-
-  if (error) throw error;
-  return data;
-}
+// These functions should only be called from Server Components
+// We define them elsewhere or handle the import carefully

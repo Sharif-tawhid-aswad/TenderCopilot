@@ -11,17 +11,22 @@ import {
   CheckCircle,
   TrendingUp,
   Plus,
-  ArrowUpRight,
-  Clock
+  ArrowUpRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/server";
-import { getTenders } from "@/lib/tenders";
+import { getTenders } from "@/lib/tenders/server";
 import Link from "next/link";
+import { isSupabaseConfigured } from "@/lib/env";
+import { SupabaseConfigWarning } from "@/components/supabase-config-warning";
 
 export default async function DashboardPage() {
+  if (!isSupabaseConfigured()) {
+    return <SupabaseConfigWarning />;
+  }
+
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const fullName = user?.user_metadata?.full_name || "there";
 
   const tenders = await getTenders();

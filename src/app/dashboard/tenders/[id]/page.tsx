@@ -1,9 +1,8 @@
-import { getTenderById } from "@/lib/tenders";
+import { getTenderById } from "@/lib/tenders/server";
 import { notFound } from "next/navigation";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
@@ -16,12 +15,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { isSupabaseConfigured } from "@/lib/env";
+import { SupabaseConfigWarning } from "@/components/supabase-config-warning";
 
 async function getTender(id: string) {
   try {
     const tender = await getTenderById(id);
     return tender;
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }
@@ -31,6 +32,10 @@ export default async function TenderDetailsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  if (!isSupabaseConfigured()) {
+    return <SupabaseConfigWarning />;
+  }
+
   const { id } = await params;
   const tender = await getTender(id);
 

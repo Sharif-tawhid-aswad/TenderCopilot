@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { signup } from "@/app/auth/actions";
+import { isSupabaseConfigured } from "@/lib/env";
+import { SupabaseConfigWarning } from "@/components/supabase-config-warning";
 
 export default async function SignupPage({
   searchParams,
@@ -11,6 +13,14 @@ export default async function SignupPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+        <SupabaseConfigWarning />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
